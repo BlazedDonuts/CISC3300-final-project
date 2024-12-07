@@ -10,6 +10,13 @@ CREATE TABLE IF NOT EXISTS items (
     FOREIGN KEY (menuID) REFERENCES menu(menuID) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS orders (
+    orderID INT AUTO_INCREMENT PRIMARY KEY,
+    itemID INT NOT NULL,
+    quantity INT NOT NULL DEFAULT 1,
+    FOREIGN KEY (itemID) REFERENCES items(id) ON DELETE CASCADE
+);
+
 INSERT INTO orders (itemID, quantity) VALUES
 (1, 2),  -- 2 Chocolate Cake
 (2, 1),  -- 1 Chocolate Ice Cream

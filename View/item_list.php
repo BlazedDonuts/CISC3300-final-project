@@ -24,6 +24,49 @@
     </header>
 
 
+    <div id="itemsList">
+    <script>
+        // Function to fetch and load items based on selected menu
+        document.getElementById('menuSelect').addEventListener('change', function () {
+            const menu_id = this.value; // Get the selected menu_id
+            loadItems(menu_id);
+        });
+
+        // Initial load of items
+        window.onload = function () {
+            const menu_id = document.getElementById('menuSelect').value;
+            loadItems(menu_id);
+        };
+
+        function loadItems(menu_id) {
+            fetch(`item_DB.php?menu_id=${menu_id}`) // GET request to fetch items by menu_id
+                .then(response => response.json())
+                .then(data => {
+                    const itemsList = document.getElementById('itemsList');
+                    itemsList.innerHTML = ''; // Clear current items
+
+                    if (data.length > 0) {
+                        data.forEach(item => {
+                            // Add each item dynamically to the page
+                            const itemDiv = document.createElement('div');
+                            itemDiv.classList.add('list__row');
+                            itemDiv.innerHTML = `
+                                <div class="list__item">
+                                    <p class="bold">${item.menuName}</p>
+                                    <p>${item.Description}</p>
+                                </div>
+                            `;
+                            itemsList.appendChild(itemDiv);
+                        });
+                    } else {
+                        itemsList.innerHTML = '<p>No items available in this category.</p>';
+                    }
+                })
+                .catch(error => console.error('Error loading items:', error));
+        }
+    </script>
+    </div>
+
     <?php if($items) { ?>
     <?php foreach ($items as $item) : ?>
     <div class="list__row">
@@ -78,6 +121,39 @@
         </div>
     </form>
 </section>
+
+<script>
+    function addItem() {
+        const menu_id = document.getElementById('menu_id').value;
+        const description = document.getElementById('description').value;
+
+        if (menu_id && description) {
+            const data = {
+                action: 'add_item',
+                menu_id: menu_id,
+                description: description
+            };
+
+            // POST request to add item
+            fetch('item_DB.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Item added:', data);
+                alert('Item added successfully!');
+                loadItems(menu_id); // Reload the items list after adding
+            })
+            .catch(error => console.error('Error adding item:', error));
+        } else {
+            alert('Please fill in all fields');
+        }
+    }
+</script>
 
 <div class="update-categories">
     <a href=".?action=list_menus">View or Update Your Categories</a>
